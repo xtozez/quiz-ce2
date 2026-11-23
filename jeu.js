@@ -224,6 +224,19 @@ const SONS = {
       .forEach(([f, d, l]) => { note(f, d, l, { type: "square", volume: 0.08 }); note(f / 2, d, l, { type: "triangle", volume: 0.2 }); });
   },
   egalite()  { [659, 523, 659, 523].forEach((f, i) => note(f, i * 0.2, 0.25, { type: "triangle", volume: 0.25 })); },
+  petard() {
+    // « Boum » de feu d'artifice : un bruit qui s'éteint
+    const a = audio(); if (!a) return;
+    const longueur = Math.floor(a.sampleRate * 0.7);
+    const buf = a.createBuffer(1, longueur, a.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < longueur; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / longueur, 4);
+    const src = a.createBufferSource(); src.buffer = buf;
+    const filtre = a.createBiquadFilter(); filtre.type = "lowpass"; filtre.frequency.value = 700 + Math.random() * 1600;
+    const g = a.createGain(); g.gain.value = 0.45;
+    src.connect(filtre).connect(g).connect(a.destination);
+    src.start();
+  },
 };
 function jouer(nom) { try { if (SONS[nom]) SONS[nom](); } catch (e) { /* pas de son */ } }
 
@@ -235,14 +248,40 @@ function petitsConfettis(eq) {
   if (typeof confetti !== "function") return;
   confetti({ particleCount: 140, spread: 90, startVelocity: 45, origin: { x: eq === "rouge" ? 0.2 : 0.8, y: 0.2 }, colors: couleursEquipe(eq) });
 }
+/* Grande fête de fin : canons à confettis sur les côtés + feux d'artifice,
+   le tout aux couleurs de l'équipe gagnante. */
+let finFete = 0;
 function grandsConfettis(eq) {
   if (typeof confetti !== "function") return;
-  const fin = Date.now() + 5000;
   const couleurs = couleursEquipe(eq);
+  finFete = Date.now() + 10000;
+  const fin = finFete;
+
+  // Canons à confettis (gauche et droite)
   (function image() {
-    confetti({ particleCount: 7, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors: couleurs });
-    confetti({ particleCount: 7, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors: couleurs });
-    if (Date.now() < fin) requestAnimationFrame(image);
+    if (fin !== finFete) return; // une nouvelle fête a commencé
+    confetti({ particleCount: 6, angle: 60, spread: 70, startVelocity: 60, origin: { x: 0, y: 0.8 }, colors: couleurs });
+    confetti({ particleCount: 6, angle: 120, spread: 70, startVelocity: 60, origin: { x: 1, y: 0.8 }, colors: couleurs });
+    if (Date.now() < fin - 3000) requestAnimationFrame(image);
+  })();
+
+  // Feux d'artifice : une fusée monte, puis explose en étoiles
+  (function fusee() {
+    if (fin !== finFete || Date.now() > fin) return;
+    const x = 0.12 + Math.random() * 0.76;
+    const y = 0.12 + Math.random() * 0.3;
+    // la traînée qui monte
+    confetti({ particleCount: 12, angle: 90, spread: 8, startVelocity: 55, gravity: 1.2, ticks: 40,
+               scalar: 0.6, origin: { x: x, y: 1 }, colors: ["#ffffff", "#ffe9a8"] });
+    // l'explosion
+    setTimeout(() => {
+      confetti({ particleCount: 110, spread: 360, startVelocity: 34, gravity: 0.7, decay: 0.91, ticks: 110,
+                 scalar: 1.2, shapes: ["star", "circle"], origin: { x: x, y: y }, colors: couleurs });
+      confetti({ particleCount: 40, spread: 360, startVelocity: 18, gravity: 0.5, decay: 0.9, ticks: 80,
+                 scalar: 0.8, origin: { x: x, y: y }, colors: ["#ffffff", "#ffd23f"] });
+      jouer("petard");
+    }, 450);
+    setTimeout(fusee, 500 + Math.random() * 600);
   })();
 }
 
@@ -572,9 +611,9 @@ function rendreTele(effet) {
     const scores = `<div class="scores-finaux">${htmlCarteScore("rouge", g === "rouge")}${htmlCarteScore("bleu", g === "bleu")}</div>`;
     if (g) {
       app.innerHTML = `
-        <div class="tele fin theme-${g}">
-          <div class="trophee ${effet === "fin" ? "pop" : "respire"}">🏆</div>
-          <h1 class="titre-fin">${esc(avecArticle(e.equipes[g].nom))}<br>a gagné !</h1>
+        <div class="tele fin victoire theme-${g}">
+          <div class="trophee saute">🏆</div>
+          <h1 class="titre-fin vainqueur">${esc(avecArticle(e.equipes[g].nom))}<br>a gagné !</h1>
           ${scores}
         </div>`;
     } else {

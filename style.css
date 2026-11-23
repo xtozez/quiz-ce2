@@ -219,6 +219,42 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1.05;
   text-shadow: 0 1vh 0 rgba(0,0,0,.3);
 }
+/* Écran du vainqueur : rayons qui tournent, titre qui brille, trophée qui saute */
+.tele.victoire { position: relative; overflow: hidden; }
+.tele.victoire > * { position: relative; z-index: 1; }
+.tele.victoire::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 45%;
+  width: 260vmax; height: 260vmax;
+  margin: -130vmax 0 0 -130vmax;
+  background: repeating-conic-gradient(rgba(255,255,255,.18) 0 9deg, transparent 9deg 18deg);
+  animation: rayons 24s linear infinite;
+  z-index: 0;
+}
+.tele.victoire::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(255,230,140,.55) 0, transparent 45%);
+  animation: lueur 2s ease-in-out infinite alternate;
+  z-index: 0;
+}
+@keyframes rayons { to { transform: rotate(360deg); } }
+@keyframes lueur { from { opacity: .4; } to { opacity: 1; } }
+.titre-fin.vainqueur {
+  animation: pop .8s cubic-bezier(.2, 1.6, .4, 1), brille 1.5s ease-in-out .8s infinite alternate;
+}
+@keyframes brille {
+  from { text-shadow: 0 1vh 0 rgba(0,0,0,.3), 0 0 2vh rgba(255,255,255,.3); transform: scale(1); }
+  to   { text-shadow: 0 1vh 0 rgba(0,0,0,.3), 0 0 5vh #fff, 0 0 12vh #ffd23f; transform: scale(1.05); }
+}
+.trophee.saute { animation: saute 1.1s ease-in-out infinite; filter: drop-shadow(0 0 4vh rgba(255,210,63,.9)); }
+@keyframes saute {
+  0%, 100% { transform: translateY(0) rotate(-8deg) scale(1); }
+  50%      { transform: translateY(-4vh) rotate(8deg) scale(1.12); }
+}
+.tele.victoire .carte-score.actif { animation: respire 1.2s ease-in-out infinite; }
 .scores-finaux { display: flex; gap: 4vw; }
 .scores-finaux .carte-score { min-width: 28vw; }
 .sous-titre-fin { font-size: min(3.4vw, 5.8vh); font-weight: 600; margin: 0; }
