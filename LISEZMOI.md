@@ -31,6 +31,7 @@
    - **❌ Mauvaise réponse** : la parole passe à l'autre équipe (si elle se trompe aussi, personne ne gagne) ;
    - **📺 Montrer la réponse à la télé**, puis **⏭️ Question suivante**.
    - En cas d'erreur : **✏️ Corriger les points** (+1 / −1).
+   - Pour arrêter en cours de route : **🚪 Quitter la partie** (tout en bas). La télé revient à l'écran d'accueil.
 6. À la fin : écran du gagnant avec confettis. En cas d'égalité : **⭐ Poser une question bonus**.
 
 ## Si ça coupe

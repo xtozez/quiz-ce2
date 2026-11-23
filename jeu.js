@@ -804,7 +804,8 @@ function rendreTel() {
         <button class="gros violet" data-action="montrer">${e.montrerReponse ? "🙈 Cacher la réponse à la télé" : "📺 Montrer la réponse à la télé"}</button>
         <button class="gros jaune ${resolu ? "attire" : ""}" data-action="suivante">${derniereQuestion(e) ? "🏁 Voir le résultat final" : "⏭️ Question suivante"}</button>
         ${htmlCorrection(e)}
-        ${htmlReglages(true)}
+        ${htmlReglages(false)}
+        <button class="gros gris" data-action="nouvelle" data-confirmer="Quitter la partie en cours ? Les scores seront effacés.">🚪 Quitter la partie</button>
       </div>`;
   }
 
